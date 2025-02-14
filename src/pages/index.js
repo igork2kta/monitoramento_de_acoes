@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [cotacoes, setCotacoes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ultimaAtualizacao, setUltimaAtualizacao] = useState(null);
 
   const fetchCotacoes = async () => {
     try {
@@ -12,6 +13,8 @@ export default function Home() {
 
       if (data.cotacoes) {
         setCotacoes(data.cotacoes);
+        // Definir a hora da última atualização
+        setUltimaAtualizacao(new Date().toLocaleString());
       }
     } catch (error) {
       console.error("Erro ao buscar cotações:", error);
@@ -37,28 +40,33 @@ export default function Home() {
       {!loading && cotacoes.length === 0 && <p>Nenhuma cotação encontrada.</p>}
 
       {!loading && cotacoes.length > 0 && (
-        <table border="1" cellPadding="10">
-          <thead>
-            <tr>
-              <th>Símbolo</th>
-              <th>Desejado</th>
-              <th>Atual</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cotacoes.map(({ simbolo, desejado, atual }) => (
-              <tr key={simbolo}>
-                <td>{simbolo}</td>
-                <td>R$ {desejado?.toFixed(2) || "-"}</td>
-                <td>R$ {atual?.toFixed(2) || "-"}</td>
-                <td style={{ color: atual >= desejado ? "red" : "green" }}>
-                  {atual >= desejado ? "Acima do desejado ❌": "Alvo atingido ✅"}
-                </td>
+        <>
+          <table border="1" cellPadding="10">
+            <thead>
+              <tr>
+                <th>Símbolo</th>
+                <th>Desejado</th>
+                <th>Atual</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {cotacoes.map(({ simbolo, desejado, atual }) => (
+                <tr key={simbolo}>
+                  <td>{simbolo}</td>
+                  <td>R$ {desejado?.toFixed(2) || "-"}</td>
+                  <td>R$ {atual?.toFixed(2) || "-"}</td>
+                  <td style={{ color: atual >= desejado ? "red" : "green" }}>
+                    {atual >= desejado ?  "Acima do esperado ❌" : "Alvo atingido ✅"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Exibir a hora da última atualização */}
+          <p><strong>Última atualização:</strong> {ultimaAtualizacao}</p>
+        </>
       )}
     </div>
   );
