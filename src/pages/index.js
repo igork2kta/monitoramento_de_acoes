@@ -18,15 +18,21 @@ export default function Home() {
         setCotacoes(data.cotacoes);
         setUltimaAtualizacao(new Date().toLocaleString());
 
+        const novosJaTocou = { ...jaTocou };
+
         data.cotacoes.forEach(({ simbolo, desejado, atual }) => {
-          if (atual >= desejado && !jaTocou[simbolo] && usuarioInteragiu) {
-            tocarAlerta();
-            enviarNotificacao(simbolo, atual);
-            setJaTocou((prev) => ({ ...prev, [simbolo]: true }));
-          } else if (atual < desejado) {
-            setJaTocou((prev) => ({ ...prev, [simbolo]: false }));
+          if (atual >= desejado) {
+            if (!jaTocou[simbolo]) {
+              tocarAlerta();
+              enviarNotificacao(simbolo, atual);
+              novosJaTocou[simbolo] = true; // Marca como já alertado
+            }
+          } else {
+            novosJaTocou[simbolo] = false; // Reseta caso volte abaixo do desejado
           }
         });
+
+        setJaTocou(novosJaTocou);
       }
     } catch (error) {
       console.error("Erro ao buscar cotações:", error);
